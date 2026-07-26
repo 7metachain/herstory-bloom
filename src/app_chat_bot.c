@@ -248,6 +248,11 @@ static void __ai_chat_handle_event(AI_NOTIFY_EVENT_T *event)
         ai_ui_wechat_hide_flower_card();
 
         if (text != NULL && text->data != NULL && strstr(text->data, "记录日志") != NULL) {
+            /* This is a local mode command, not a question for the cloud LLM.
+             * Stop the current chat response so it cannot create a card before
+             * the user supplies the actual diary text. */
+            tuya_ai_agent_event(AI_EVENT_CHAT_BREAK, 0);
+            PR_NOTICE("diary command recognized; waiting for diary content");
             const char *marker = strstr(text->data, "记录日志");
             const char *tail = marker + strlen("记录日志");
             while (*tail == ' ' || *tail == ',' || *tail == ':') {
