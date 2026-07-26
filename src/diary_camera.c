@@ -30,6 +30,8 @@ static void __diary_camera_task(void *arg)
         }
 
         http_client_response_t response = {0};
+        PR_NOTICE("diary camera: HTTP GET http://%s:%d%s request_body=0 bytes",
+                  DIARY_CAMERA_HOST, DIARY_CAMERA_PORT, DIARY_CAMERA_PATH);
         ai_ui_disp_msg(AI_UI_DISP_NOTIFICATION, (uint8_t *)"正在请求照片", strlen("正在请求照片"));
         http_client_status_t status = http_client_request(
             &(const http_client_request_t){
@@ -44,10 +46,20 @@ static void __diary_camera_task(void *arg)
             &response);
 
         if (status == HTTP_CLIENT_SUCCESS) {
+            PR_NOTICE("diary camera: GET complete status=%d headers=%u body=%u buffer=%u",
+                      response.status_code,
+                      (unsigned)response.headers_length,
+                      (unsigned)response.body_length,
+                      (unsigned)response.buffer_length);
             PR_NOTICE("diary camera: GET http://%s:%d%s status=%d",
                       DIARY_CAMERA_HOST, DIARY_CAMERA_PORT, DIARY_CAMERA_PATH,
                       response.status_code);
             if (response.body && response.body_length > 0) {
+                PR_NOTICE("diary camera: response bytes=%u first=%02X %02X last=%02X %02X",
+                          (unsigned)response.body_length,
+                          response.body[0], response.body[1],
+                          response.body[response.body_length - 2],
+                          response.body[response.body_length - 1]);
                 if (response.status_code == 200 && response.body_length <= DIARY_CAMERA_MAX_JPEG &&
                     response.body_length >= 2 && response.body[0] == 0xFF && response.body[1] == 0xD8) {
                     PR_NOTICE("diary camera: received JPEG (%u bytes)", (unsigned)response.body_length);
