@@ -9,8 +9,8 @@
 #include "ai_ui_manage.h"
 #include "tal_api.h"
 
-#define DIARY_CAMERA_HOST       "343fafad.r12.cpolar.top"
-#define DIARY_CAMERA_PORT       80
+#define DIARY_CAMERA_HOST       "172.168.1.34"
+#define DIARY_CAMERA_PORT       8080
 #define DIARY_CAMERA_PATH       "/snap"
 #define DIARY_CAMERA_TIMEOUT_MS 20000
 #define DIARY_CAMERA_MAX_JPEG  (512 * 1024)
