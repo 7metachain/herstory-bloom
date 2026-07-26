@@ -1,0 +1,31 @@
+menu "configure app (environment_sensor_chatbot)"
+
+config TUYA_PRODUCT_ID
+    string "product ID of project"
+    default "alon7qgyjj8yus74"
+
+config IRRIGATION_TEMP_THRESHOLD_CENTI_C
+    int "Watering temperature threshold (0.01 C)"
+    default 2000
+
+config IRRIGATION_HUMIDITY_THRESHOLD_CENTI_PERCENT
+    int "Watering humidity threshold (0.01 percent)"
+    default 4500
+    range 0 10000
+
+config IRRIGATION_PUMP_DURATION_MS
+    int "Pump run duration (ms)"
+    default 5000
+    range 100 60000
+
+config IRRIGATION_COOLDOWN_MS
+    int "Minimum interval between watering (ms)"
+    default 600000
+    range 60000 86400000
+
+config APP_NEED_AI_COMPONENTS
+    bool
+    default y
+    select ENABLE_AI_COMPONENTS
+
+endmenu
