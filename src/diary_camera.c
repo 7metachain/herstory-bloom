@@ -125,9 +125,13 @@ OPERATE_RET diary_camera_init(void)
 OPERATE_RET diary_camera_trigger(void)
 {
     uint8_t request = 1;
+    OPERATE_RET rt;
 
     if (!sg_camera_initialized) {
+        PR_ERR("diary camera: trigger rejected, worker not initialized");
         return OPRT_RESOURCE_NOT_READY;
     }
-    return tal_queue_post(sg_camera_queue, &request, 0);
+    rt = tal_queue_post(sg_camera_queue, &request, 0);
+    PR_NOTICE("diary camera: trigger queued rt=%d", rt);
+    return rt;
 }

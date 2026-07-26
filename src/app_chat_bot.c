@@ -141,6 +141,8 @@ static void __flower_capture_entry(const char *content)
     PR_NOTICE("diary entry received, text=%s", sg_flower_user_text);
     if (diary_camera_trigger() != OPRT_OK) {
         PR_WARN("diary camera trigger queue unavailable");
+    } else {
+        ai_ui_disp_msg(AI_UI_DISP_NOTIFICATION, (uint8_t *)"拍照请求已排队", strlen("拍照请求已排队"));
     }
     ai_ui_disp_msg(AI_UI_DISP_NOTIFICATION, (uint8_t *)"正在拍摄并记录日志", strlen("正在拍摄并记录日志"));
 }
