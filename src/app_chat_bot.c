@@ -254,6 +254,7 @@ static void __ai_chat_handle_event(AI_NOTIFY_EVENT_T *event)
              * Keep the agent session intact (breaking it here can put binary
              * protocol/audio bytes on the debug stream); local state below
              * prevents a flower card until the diary text arrives. */
+            (void)tuya_ai_output_stop(TRUE);
             PR_NOTICE("diary command recognized; waiting for diary content");
             const char *marker = strstr(text->data, "记录日志");
             const char *tail = marker + strlen("记录日志");
