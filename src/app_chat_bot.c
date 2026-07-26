@@ -249,28 +249,32 @@ static void __ai_chat_handle_event(AI_NOTIFY_EVENT_T *event)
         text = (AI_NOTIFY_TEXT_T *)event->data;
         ai_ui_wechat_hide_flower_card();
 
-        if (text != NULL && text->data != NULL && strstr(text->data, "记录日志") != NULL) {
-            /* This is a local mode command, not a question for the cloud LLM.
-             * Keep the agent session intact (breaking it here can put binary
-             * protocol/audio bytes on the debug stream); local state below
-             * prevents a flower card until the diary text arrives. */
-            (void)tuya_ai_output_stop(TRUE);
-            PR_NOTICE("diary command recognized; waiting for diary content");
+        if (text != NULL && text->data != NULL &&
+            (strstr(text->data, "记录日志") != NULL ||
+             strstr(text->data, "日志记录") != NULL ||
+             strstr(text->data, "写日志") != NULL ||
+             strstr(text->data, "记日志") != NULL ||
+             strstr(text->data, "日志") != NULL)) {
+            /* A diary keyword is a complete one-shot command: trigger the
+             * camera immediately.  Do not stop the AI output here, because
+             * interrupting the audio/protocol stream can produce binary bytes
+             * on the debug serial port. */
             const char *marker = strstr(text->data, "记录日志");
-            const char *tail = marker + strlen("记录日志");
+            size_t keyword_len = strlen("记录日志");
+            if (marker == NULL) { marker = strstr(text->data, "日志记录"); keyword_len = strlen("日志记录"); }
+            if (marker == NULL) { marker = strstr(text->data, "写日志"); keyword_len = strlen("写日志"); }
+            if (marker == NULL) { marker = strstr(text->data, "记日志"); keyword_len = strlen("记日志"); }
+            if (marker == NULL) { marker = strstr(text->data, "日志"); keyword_len = strlen("日志"); }
+            const char *tail = marker + keyword_len;
             while (*tail == ' ' || *tail == ',' || *tail == ':') {
                 tail++;
             }
-            sg_diary_mode = true;
+            sg_diary_mode = false;
             sg_diary_entry_active = false;
             sg_flower_user_text[0] = '\0';
             sg_flower_reply[0] = '\0';
-            if (*tail != '\0') {
-                __flower_capture_entry(tail);
-            } else {
-                ai_ui_disp_msg(AI_UI_DISP_NOTIFICATION, (uint8_t *)"日志模式：请说今天的日志", strlen("日志模式：请说今天的日志"));
-                PR_NOTICE("diary mode entered; say the diary content now");
-            }
+            PR_NOTICE("diary command recognized; triggering camera immediately");
+            __flower_capture_entry(*tail != '\0' ? tail : "今天的日志");
             break;
         }
 
