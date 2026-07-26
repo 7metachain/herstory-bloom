@@ -336,10 +336,18 @@ OPERATE_RET app_chat_bot_init(void)
 
 #if defined(ENABLE_COMP_AI_MCP) && (ENABLE_COMP_AI_MCP == 1)
     TUYA_CALL_ERR_RETURN(ai_mcp_init());
+#if !defined(CONFIG_HERSTORY_DEBUG_DISABLE_I2C)
     TUYA_CALL_ERR_RETURN(environment_mcp_init());
+#else
+    PR_NOTICE("herstory debug mode: environment I2C/MCP disabled");
+#endif
 #endif
 
+#if !defined(CONFIG_HERSTORY_DEBUG_DISABLE_I2C)
     TUYA_CALL_ERR_RETURN(irrigation_controller_init());
+#else
+    PR_NOTICE("herstory debug mode: irrigation sensor thread disabled");
+#endif
     TUYA_CALL_ERR_RETURN(diary_camera_init());
 
 #if defined(ENABLE_COMP_AI_PICTURE) && (ENABLE_COMP_AI_PICTURE == 1)
